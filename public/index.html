@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Feedbacks</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Análise de Sentimento da Experiência do Cliente </h1>
+        <div id="files"></div>
+        <div class="explanation">
+            <h3>Explicações:</h3>
+            <p><strong>Score:</strong> O Score é o valor geral da análise de sentimento. Um valor negativo indica um sentimento negativo, enquanto um valor positivo indica um sentimento positivo.</p>
+            <p><strong>Comparative:</strong> O Comparative é o sentimento ajustado por número de palavras. É uma média do Score por palavra no feedback. Um valor negativo sugere que, em média, as palavras têm um sentimento negativo.</p>
+            <p><strong>Calculation:</strong> O Calculation mostra o sentimento associado a cada palavra no texto. Palavras negativas têm valores negativos e contribuem para um sentimento geral negativo.</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadFiles() {
+            const response = await fetch('/output');
+            const files = await response.json();
+            const filesContainer = document.getElementById('files');
+            files.forEach(file => {
+                fetch(`/output/${file}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const feedbackDiv = document.createElement('div');
+                        feedbackDiv.classList.add('file');
+                        feedbackDiv.innerHTML = `
+                            <div class="feedback">
+                                <h3>${file.replace('.json', '')}</h3>
+                                <p>Sentimento: ${getSentimentLabel(data.score)}</p>
+                                <div class="scale">
+                                    <div style="width: ${Math.max(data.score * 10, 0)}%"></div>
+                                    <div class="scale-label">${data.score.toFixed(1)}</div>
+                                </div>
+                                <div class="details">
+                                    <h4>Score:</h4>
+                                    <p>${data.score.toFixed(2)}</p>
+                                    <h4>Comparative:</h4>
+                                    <p>${data.comparative.toFixed(2)}</p>
+                                    <h4>Calculation:</h4>
+                                    <pre>${JSON.stringify(data.calculation, null, 2)}</pre>
+                                    <h4>Palavras Negativas:</h4>
+                                    <p>${data.negative.join(', ')}</p>
+                                    <h4>Palavras Positivas:</h4>
+                                    <p>${data.positive.length > 0 ? data.positive.join(', ') : 'Nenhuma'}</p>
+                                </div>
+                            </div>
+                        `;
+                        filesContainer.appendChild(feedbackDiv);
+                    });
+            });
+        }
+
+        function getSentimentLabel(score) {
+            if (score > 0) return 'Positivo';
+            if (score < 0) return 'Negativo';
+            return 'Neutro';
+        }
+
+        loadFiles();
+    </script>
+</body>
+</html>

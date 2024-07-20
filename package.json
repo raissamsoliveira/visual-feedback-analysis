@@ -1,0 +1,15 @@
+{
+    "name": "visual-feedback-analysis",
+    "version": "1.0.0",
+    "description": "Analyze visual feedback from customers using OCR and sentiment analysis",
+    "main": "src/analyze.js",
+    "scripts": {
+        "start": "node src/analyze.js",
+        "server": "node src/server.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "sentiment": "^5.0.2",
+        "tesseract.js": "^5.1.0"
+    }
+}
